@@ -19,12 +19,12 @@ Check this library is a very good option for beginners and professional develope
 
 Customers |Accounts |Transactions |Logs |Loans |Users|
 ------------ | ------------- | ------------- | ------------- | ------------- | -------------
-MicrosoftAccessConnection |Console |FileSystem |Characters |Security
-MySQLConnection |ConsoleForeground |DirectorySystem | Numbers
-SQLiteConnection |ConsoleBackGround |AudioFile|Strings
-DatabaseListener |OperatingSystem |ImageFile |
-DBRepository |GraphicUser | TextFile
-| |SwingUI |DirectFile |
+Edit customers |Edit accounts |FileSystem |Characters |Security
+Add new customer |Add new account |DirectorySystem | Numbers
+Show customers |Show accounts |AudioFile|Strings
+Transfer money | |ImageFile |
+Give loans | | TextFile
+| |SwingUI | |
 | | |Internet |
 
 ## Run

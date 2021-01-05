@@ -21,8 +21,8 @@ Check this library is a very good option for beginners and professional develope
 
 Customers |Accounts |Transactions |Logs |Loans |Users|
 ------------ | ------------- | ------------- | ------------- | ------------- | -------------
-Customer |Accounts |Soon transaction |Characters |Security
-CustomerRepository |Soon |DirectorySystem | Numbers
+Customer |Accounts |Soon |Soon |Security
+CustomerRepository |AccountRepository |Soon |DirectorySystem | Numbers
 ||s|Soon
 | | |
 | |

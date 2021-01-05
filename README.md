@@ -17,3 +17,16 @@ Check this library is a very good option for beginners and professional develope
 * Edit customer or an employee easily.
 * Has help for more information.
 
+## Run
+
+Compile and run project, the project needs at least JDK 11.
+You can also run application from out folder.
+
+## Note
+
+You need internet connection to run compiled application.
+
+```
+The database is not available to modify
+```
+

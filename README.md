@@ -17,6 +17,8 @@ Check this library is a very good option for beginners and professional develope
 * Edit customer or an employee easily.
 * Has help for more information.
 
+
+
 Customers |Accounts |Transactions |Logs |Loans |Users|
 ------------ | ------------- | ------------- | ------------- | ------------- | -------------
 Edit customers |Edit accounts |FileSystem |Characters |Security
@@ -24,8 +26,8 @@ Add new customer |Add new account |DirectorySystem | Numbers
 Show customers |Show accounts |AudioFile|Strings
 Transfer money | |ImageFile |
 Give loans | | TextFile
-| |SwingUI | |
-| | |Internet |
+| | | |
+| | | |
 
 ## Run
 

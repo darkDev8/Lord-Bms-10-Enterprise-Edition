@@ -21,11 +21,11 @@ Check this library is a very good option for beginners and professional develope
 
 Customers |Accounts |Transactions |Logs |Loans |Users|
 ------------ | ------------- | ------------- | ------------- | ------------- | -------------
-Customer |Edit accounts |System adds new transaction |Characters |Security
-CustomerRepository |Add new account |DirectorySystem | Numbers
- |Show accounts |AudioFile|Strings
- | |ImageFile |
- | | TextFile
+Customer |Accounts |System adds new transaction |Characters |Security
+CustomerRepository |AccountRepository |DirectorySystem | Numbers
+||AudioFile|Strings
+| |ImageFile |
+| | TextFile
 | | | |
 | | | |
 

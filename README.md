@@ -23,7 +23,7 @@ Customers |Accounts |Transactions |Logs |Loans |Users|
 ------------ | ------------- | ------------- | ------------- | ------------- | -------------
 Customer |Accounts |Soon transaction |Characters |Security
 CustomerRepository |Soon |DirectorySystem | Numbers
-|| |Soon
+||s|Soon
 | | |
 | |
 | | | |

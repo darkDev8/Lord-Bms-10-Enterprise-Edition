@@ -3,7 +3,7 @@ Lord Bms is an advanced banking management system with lots of features and cust
 
 **This project heavily use [SDKLibrary 3.0](https://github.com/mahdiDedsec/SDKLibrary-3.0.git)  library.**
 
-![#f03c15]Check this library is a very good option for beginners and professional developers with excellent tools.
+Check this library is a very good option for beginners and professional developers with excellent tools.
 
 
 ## Features
@@ -24,6 +24,7 @@ Customers |Accounts |Transactions |Logs |Loans |Users|
 Customer |Accounts |Soon |Soon |Soon | Soon | Soon
 CustomerRepository |AccountRepository |Soon |Soon | Soon
 
+
 ## Run
 
 Compile and run project, the project needs at least **JDK 11**.
@@ -36,4 +37,10 @@ You need internet connection to run compiled application.
 ```
 The database is not available to modify
 ```
+
+```diff
+ text in red
+```
+
+s
 

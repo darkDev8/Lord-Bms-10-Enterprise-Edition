@@ -38,9 +38,3 @@ You need internet connection to run compiled application.
 The database is not available to modify
 ```
 
-```diff
- text in red
-```
-
-s
-

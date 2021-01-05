@@ -20,9 +20,10 @@ Check this library is a very good option for beginners and professional develope
 
 Customers | Accounts | Transactions | Logs | Loans | Users |
 --------- |--------- |------------- |----- |------ |---------
+
 Customers|Accounts|Soon|Soon|Soon|Soon
 CustomerRepository|AccountRepository|Soon|Soon|Soon|Soon
-
+--------- |--------- |------------- |----- |------ |---------
 
 
 ## Run

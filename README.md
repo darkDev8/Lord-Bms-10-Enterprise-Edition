@@ -23,9 +23,9 @@ Customers |Accounts |Transactions |Logs |Loans |Users|
 ------------ | ------------- | ------------- | ------------- | ------------- | -------------
 Customer |Accounts |System adds new transaction |Characters |Security
 CustomerRepository |AccountRepository |DirectorySystem | Numbers
-||AudioFile|Strings
-| |ImageFile |
-| | TextFile
+|||Strings
+| | |
+| |
 | | | |
 | | | |
 

@@ -10,7 +10,7 @@ Check this library is a very good option for beginners and professional develope
  
 * Show customer and employees logs.
 * Manage account transactions.
-* Application customization
+* Application customization.
 * Simple notepad with usefull edit and search tools.
 * Export to (PDF,Excel) format files and print items.
 * Simple AES text encryptor.

@@ -33,6 +33,7 @@ You can also run application from **out folder**.
 ## Note
 
 You need internet connection to run compiled application.
+Remember: this project is in **Alpha** stage.
 
 ```
 The database is not available to modify

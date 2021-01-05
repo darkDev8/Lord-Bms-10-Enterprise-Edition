@@ -17,7 +17,7 @@ Check this library is a very good option for beginners and professional develope
 * Edit customer or an employee easily.
 * Has help for more information.
 
-Customers |Accounts |Transactions |Logs |Loans |Users
+Customers |Accounts |Transactions |Logs |Loans |Users|
 ------------ | ------------- | ------------- | ------------- | -------------
 MicrosoftAccessConnection |Console |FileSystem |Characters |Security
 MySQLConnection |ConsoleForeground |DirectorySystem | Numbers

@@ -4,3 +4,13 @@ Lord Bms is an advanced banking management system with lots of features and cust
 This project heavily use [SDKLibrary 3.0](https://github.com/mahdiDedsec/SDKLibrary-3.0.git)  library.
 
 Check this library is a very good option for beginners and professional developers with excellent tools.
+
+
+## New feature
+ 
+* Database tools.
+* Datatypes.
+* Operating system utilities.
+* Swing interface tools.
+* Security tools.
+* Access files more simple.

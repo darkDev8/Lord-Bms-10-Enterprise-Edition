@@ -6,11 +6,14 @@ This project heavily use [SDKLibrary 3.0](https://github.com/mahdiDedsec/SDKLibr
 Check this library is a very good option for beginners and professional developers with excellent tools.
 
 
-## New feature
+## Features
  
-* Database tools.
-* Datatypes.
-* Operating system utilities.
-* Swing interface tools.
-* Security tools.
-* Access files more simple.
+* Show customer and employees logs.
+* Manage account transactions.
+* Application customization
+* Simple notepad with usefull edit and search tools.
+* Export to (PDF,Excel) format files and print items.
+* Simple AES text encryptor.
+* Edit customer or an employee easily.
+* Has help for more information.
+

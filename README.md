@@ -19,8 +19,8 @@ Check this library is a very good option for beginners and professional develope
 
 ## Run
 
-Compile and run project, the project needs at least JDK 11.
-You can also run application from out folder.
+Compile and run project, the project needs at least **JDK 11**.
+You can also run application from **out folder**.
 
 ## Note
 

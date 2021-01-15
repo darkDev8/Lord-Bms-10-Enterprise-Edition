@@ -4,6 +4,7 @@ import com.bms.utility.Utils;
 import com.sdk.storage.DirectorySystem;
 import com.sdk.storage.FileSystem;
 import com.sdk.storage.files.TextFile;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -32,6 +33,9 @@ public class FindInFiles extends javax.swing.JDialog {
         Utils.swingUI.setJDialogCenter(this);
         Utils.swingUI.setJDialogCloseESC(this);
         Utils.swingUI.makeJDialogMovable(this);
+        
+        listFIles.setSelectionBackground(Color.decode(Utils.settings.getColorCode()));
+        btnSearchFiles.setBackground(Color.decode(Utils.settings.getColorCode()));
 
         ActionListener taskPerformer = (ActionEvent evt) -> {
             if (!txtPath.getText().isEmpty() && !txtText.getText().isEmpty()) {
@@ -135,7 +139,7 @@ public class FindInFiles extends javax.swing.JDialog {
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(chkMatch)
                     .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(15, Short.MAX_VALUE))
+                .addContainerGap(13, Short.MAX_VALUE))
         );
 
         jInternalFrame2.setTitle("List files");
@@ -143,6 +147,8 @@ public class FindInFiles extends javax.swing.JDialog {
 
         lblFiles.setText("Files");
 
+        listFIles.setToolTipText("");
+        listFIles.setSelectionBackground(new java.awt.Color(0, 0, 0));
         listFIles.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 listFIlesMouseClicked(evt);
@@ -169,7 +175,7 @@ public class FindInFiles extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(lblFiles)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 271, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -180,7 +186,7 @@ public class FindInFiles extends javax.swing.JDialog {
             }
         });
 
-        btnSearchFiles.setBackground(new java.awt.Color(51, 51, 255));
+        btnSearchFiles.setBackground(new java.awt.Color(0, 0, 0));
         btnSearchFiles.setForeground(new java.awt.Color(254, 254, 254));
         btnSearchFiles.setText("Search files");
         btnSearchFiles.setEnabled(false);

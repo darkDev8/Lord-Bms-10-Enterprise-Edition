@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+<comment>Settings values</comment>
+<entry key="closeRegister">true</entry>
+<entry key="defaultMoney">20000</entry>
+<entry key="dialogPath">E:\musics</entry>
+<entry key="payment">10</entry>
+<entry key="appColor">#003366</entry>
+<entry key="tableRecords">10</entry>
+</properties>

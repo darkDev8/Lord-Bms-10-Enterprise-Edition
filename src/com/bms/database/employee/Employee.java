@@ -4,7 +4,6 @@ package com.bms.database.employee;
 public class Employee {
     
     private int id;
-    private int uid;
     
     private String name;
     private String mobile;
@@ -12,7 +11,6 @@ public class Employee {
     private String user;
     private String pass;
     private String hint;
-    private String father;
     private String date;
 
     public int getId() {
@@ -21,14 +19,6 @@ public class Employee {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getUid() {
-        return uid;
-    }
-
-    public void setUid(int uid) {
-        this.uid = uid;
     }
 
     public String getName() {
@@ -77,14 +67,6 @@ public class Employee {
 
     public void setHint(String hint) {
         this.hint = hint;
-    }
-
-    public String getFather() {
-        return father;
-    }
-
-    public void setFather(String father) {
-        this.father = father;
     }
 
     public String getDate() {

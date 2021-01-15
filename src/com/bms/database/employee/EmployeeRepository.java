@@ -3,15 +3,16 @@ package com.bms.database.employee;
 import com.bms.database.customer.Customer;
 import com.bms.utility.Utils;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Objects;
 import javax.swing.JTable;
 
 public class EmployeeRepository {
 
-    public void loadEmployees(JTable table) {
+    public void loadEmployees(JTable table, String[] columns) {
         try {
-            Utils.dBRepository.fillJTable("employees", new String[]{"id", "uid", "name", "mobile", "ncode", "date"}, table);
+            Utils.dBRepository.fillJTable("employees", columns, table);
         } catch (SQLException e) {
             Utils.swingUI.showErrorDialog(e.getMessage(), "Loading employees failed.");
         }
@@ -26,28 +27,15 @@ public class EmployeeRepository {
         }
     }
 
-    public int exist(String ncode) {
+    public int exist(String column, String value, String type) {
         try {
-            if (Utils.dBRepository.isTableContains("employees", "ncode", ncode, "")) {
+            if (Utils.dBRepository.isTableContains("employees", column, value, type)) {
                 return 1;
             }
 
             return 0;
         } catch (SQLException e) {
-            Utils.swingUI.showErrorDialog(e.getMessage(), "Checking employee failed.");
-            return -1;
-        }
-    }
-
-    public int userIDExist(String userID) {
-        try {
-            if (Utils.dBRepository.isTableContains("employees", "uid", userID, "")) {
-                return 1;
-            }
-
-            return 0;
-        } catch (SQLException e) {
-            Utils.swingUI.showErrorDialog(e.getMessage(), "Checking User ID failed.");
+            Utils.swingUI.showErrorDialog(e.getMessage(), "Checking employees failed.");
             return -1;
         }
     }
@@ -57,19 +45,17 @@ public class EmployeeRepository {
             return false;
         }
 
-        String sql = "INSERT INTO employees(uid,name,mobile,ncode,user,pass,hint,father,date)"
-                + " VALUES(?,?,?,?,?,?,?,?,?)";
+        String sql = "INSERT INTO employees(name,mobile,ncode,user,pass,hint,date)"
+                + " VALUES(?,?,?,?,?,?,?)";
 
         try (PreparedStatement pstmt = Utils.connection.prepareStatement(sql)) {
-            pstmt.setInt(1, employee.getUid());
-            pstmt.setString(2, employee.getName());
-            pstmt.setString(3, employee.getMobile());
-            pstmt.setString(4, employee.getNcode());
-            pstmt.setString(5, employee.getUser());
-            pstmt.setString(6, employee.getPass());
-            pstmt.setString(7, employee.getHint());
-            pstmt.setString(8, employee.getFather());
-            pstmt.setString(9, employee.getDate());
+            pstmt.setString(1, employee.getName());
+            pstmt.setString(2, employee.getMobile());
+            pstmt.setString(3, employee.getNcode());
+            pstmt.setString(4, employee.getUser());
+            pstmt.setString(5, employee.getPass());
+            pstmt.setString(6, employee.getHint());
+            pstmt.setString(7, employee.getDate());
 
             pstmt.executeUpdate();
             return true;
@@ -80,29 +66,52 @@ public class EmployeeRepository {
         }
     }
 
-    public int usernameExist(String username) {
-        try {
-            if (Utils.dBRepository.isTableContains("employees", "user", username, "")) {
-                return 1;
+    public Employee getEmployee(String column, String key) {
+        String sql = "SELECT * FROM employees WHERE " + column + "= '" + key + "'";
+        Employee employee = new Employee();
+
+        try (PreparedStatement pstmt = Utils.connection.prepareStatement(sql); ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                employee.setId(rs.getInt("id"));
+                employee.setName(rs.getString("name"));
+                employee.setMobile(rs.getString("mobile"));
+                employee.setNcode(rs.getString("ncode"));
+                employee.setUser(rs.getString("user"));
+                employee.setPass(rs.getString("pass"));
+                employee.setHint(rs.getString("hint"));
+                employee.setDate(rs.getString("date"));
             }
 
-            return 0;
+            return employee;
         } catch (SQLException e) {
-            Utils.swingUI.showErrorDialog(e.getMessage(), "Checking username failed.");
-            return -1;
+            Utils.swingUI.showErrorDialog("Unable to fetch employee data from database.\n" + e.getMessage(), "Fetch failed");
+            return null;
         }
     }
 
-    public int passwordExist(String password) {
-        try {
-            if (Utils.dBRepository.isTableContains("employees", "pass", password, "")) {
-                return 1;
-            }
+    public boolean editEmployee(Employee employee) {
+        String query = "UPDATE employees set name=?,mobile=?,ncode=?,user=?,pass=?,hint=?,date=? WHERE id=? ";
 
-            return 0;
-        } catch (SQLException e) {
-            Utils.swingUI.showErrorDialog(e.getMessage(), "Checking password failed.");
-            return -1;
+        if (Objects.isNull(employee)) {
+            return false;
+        }
+
+        try (PreparedStatement ps = Utils.connection.prepareStatement(query)) {
+            ps.setString(1, employee.getName());
+            ps.setString(2, employee.getMobile());
+            ps.setString(3, employee.getNcode());
+            ps.setString(4, employee.getUser());
+            ps.setString(5, employee.getPass());
+            ps.setString(6, employee.getHint());
+            ps.setString(7, employee.getDate());
+
+            ps.setInt(8, employee.getId());
+            ps.executeUpdate();     //executeUpdate returns 0 value if true
+            return true;
+        } catch (Exception e) {
+            Utils.swingUI.showErrorDialog("Failed to update employee.\n" + e.getMessage(), "Employee update failed");
+            return false;
         }
     }
 

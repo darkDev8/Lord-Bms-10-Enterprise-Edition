@@ -1,20 +1,35 @@
 package com.bms.forms;
 
+import com.bms.database.account.Account;
 import com.bms.database.account.AccountRepository;
+import com.bms.database.account.EditAccount;
 import com.sdk.environment.SwingUI;
 import com.bms.database.connection.DatabaseConnection;
 import com.bms.database.customer.Customer;
 import com.bms.database.customer.CustomerRepository;
 import com.bms.database.employee.EmployeeRepository;
+import com.bms.database.transaction.TransactionRepository;
 import com.bms.dialogs.AskDialog;
 import com.bms.dialogs.Login;
-import com.bms.dialogs.NewAccount;
-import com.bms.dialogs.NewEmployee;
-import com.bms.dialogs.Notepad;
+import com.bms.database.account.NewAccount;
+import com.bms.database.customer.EditCustomer;
+import com.bms.database.customerlog.CustomerLogRepository;
+import com.bms.database.employee.EditEmployee;
+import com.bms.database.employee.Employee;
+import com.bms.database.employee.NewEmployee;
+import com.bms.database.employeelog.EmployeeLogRepository;
+import com.bms.database.loan.LoanRepository;
+import com.bms.database.loan.NewLoan;
+import com.bms.database.transaction.Transaction;
+import com.bms.dialogs.About;
+import com.bms.dialogs.Settings;
+import com.bms.dialogs.ShowLogs;
+import com.bms.dialogs.ShowUsers;
 import com.bms.dialogs.TextEncryptor;
 import com.bms.root.Boot;
 import com.bms.utility.NewJFrame;
 import com.bms.utility.Utils;
+import static com.bms.utility.Utils.envs;
 import com.sdk.datatypes.Numbers;
 import com.sdk.datatypes.Strings;
 import com.sdk.environment.OperatingSystem;
@@ -25,6 +40,8 @@ import java.awt.Font;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
 import java.io.File;
 import java.io.IOException;
@@ -53,31 +70,37 @@ import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableRowSorter;
 import javax.swing.filechooser.FileView;
 import java.util.List;
+import javax.swing.event.ListSelectionEvent;
 
 public class Main extends javax.swing.JFrame {
-    
+
     private Internet internet;
     private Boot boot;
-    
+
     private CustomerRepository customerRepository;
     private AccountRepository accountRepository;
     private EmployeeRepository employeeRepository;
-    
+    private TransactionRepository transactionRepository;
+    private CustomerLogRepository customerLogRepository;
+    private EmployeeLogRepository employeeLogRepository;
+    private LoanRepository loanRepository;
+
+    private Customer customer;
+    private Account account;
+    private Employee employee;
+    private Transaction transaction;
+
     private JTableHeader th;
-    private final String[] CUSTOMER_COLUMNS = {"ID", "User ID", "Name", "Mobile", "National code", "Date"};
-    private final String[] ACCOUNT_COLUMNS = {"ID", "Foreign ID", "Account number", "Money", "Type"};
-    private final String[] EMPLOYEE_COLUMNS = {"ID", "User ID", "Name", "Mobile", "National code", "Date"};
-    
+
     private int errors;
     private String ncode;
     private String password;
     private String username;
-    private String userID;
     private String date;
-    
+
     public Main() {
         initComponents();
-        
+
         boot = new Boot();
         boot.loadBuildNumber()
                 .loadCurrentOS()
@@ -87,21 +110,37 @@ public class Main extends javax.swing.JFrame {
                 .loadSystemTime()
                 .loadSystemDate()
                 .loadSystemUser()
-                .loadSystemUserHomeDirectory();
-        
+                .loadSystemUserHomeDirectory()
+                .loadEncryptionKey()
+                .loadManagerPassword()
+                .loadSettings();
+
+        customer = new Customer();
+        account = new Account();
+        employee = new Employee();
+        transaction = new Transaction();
+
+        customerRepository = new CustomerRepository();
+        accountRepository = new AccountRepository();
+        employeeRepository = new EmployeeRepository();
+        transactionRepository = new TransactionRepository();
+        customerLogRepository = new CustomerLogRepository();
+        employeeLogRepository = new EmployeeLogRepository();
+        loanRepository = new LoanRepository();
+
         loadFrameContent();
         loadDatabaseConnection();
-        loadCustomers();
-        
+        loadAll();
+
         password = Utils.generateCustomerPassword(lblPassword);
-        userID = Utils.generateUserID(null);
+        Utils.envs.put("emp", "1");
     }
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        panelTitle = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         lblTime = new javax.swing.JLabel();
         lblUsername = new javax.swing.JLabel();
@@ -140,8 +179,9 @@ public class Main extends javax.swing.JFrame {
         menuItemEmployee = new javax.swing.JMenuItem();
         menuItemLoan = new javax.swing.JMenuItem();
         menuShow = new javax.swing.JMenu();
-        jMenuItem4 = new javax.swing.JMenuItem();
-        jMenuItem5 = new javax.swing.JMenuItem();
+        menuItemShowUsers = new javax.swing.JMenuItem();
+        menuItemShowLogs = new javax.swing.JMenuItem();
+        menuItemDeleteTransactions = new javax.swing.JMenuItem();
         menuItemPrint = new javax.swing.JMenuItem();
         menuItemCountTable = new javax.swing.JMenuItem();
         menuItemRefresh = new javax.swing.JMenuItem();
@@ -150,20 +190,19 @@ public class Main extends javax.swing.JFrame {
         jMenu2 = new javax.swing.JMenu();
         menuItemSettings = new javax.swing.JMenuItem();
         menuItemExportExcel = new javax.swing.JMenuItem();
-        menuItemNotepad = new javax.swing.JMenuItem();
         menuItemTextEncryptor = new javax.swing.JMenuItem();
         jMenu5 = new javax.swing.JMenu();
         menuItemHelp = new javax.swing.JMenuItem();
-        jMenuItem13 = new javax.swing.JMenuItem();
-        jMenuItem14 = new javax.swing.JMenuItem();
-        jMenuItem15 = new javax.swing.JMenuItem();
+        menuItemSendFeedback = new javax.swing.JMenuItem();
+        menuItemReportBug = new javax.swing.JMenuItem();
+        menuItemAbout = new javax.swing.JMenuItem();
         menuItemTest = new javax.swing.JMenuItem();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Lord Bms 10 Enterprise Edition");
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(51, 51, 255));
+        panelTitle.setBackground(new java.awt.Color(0, 0, 0));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 24)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
@@ -181,26 +220,26 @@ public class Main extends javax.swing.JFrame {
         lblBuild.setForeground(new java.awt.Color(255, 255, 255));
         lblBuild.setText("Build 1");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout panelTitleLayout = new javax.swing.GroupLayout(panelTitle);
+        panelTitle.setLayout(panelTitleLayout);
+        panelTitleLayout.setHorizontalGroup(
+            panelTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTitleLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(panelTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelTitleLayout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblBuild))
                     .addComponent(lblUsername)
                     .addComponent(lblTime))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(472, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        panelTitleLayout.setVerticalGroup(
+            panelTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTitleLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(panelTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1)
                     .addComponent(lblBuild))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -238,11 +277,18 @@ public class Main extends javax.swing.JFrame {
             }
         ));
         tableMain.setAutoResizeMode(javax.swing.JTable.AUTO_RESIZE_ALL_COLUMNS);
-        tableMain.setSelectionBackground(new java.awt.Color(51, 51, 255));
+        tableMain.setSelectionBackground(new java.awt.Color(0, 0, 0));
         tableMain.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tableMain.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         tableMain.setShowGrid(false);
+        tableMain.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tableMainMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tableMain);
+
+        panelRegisterCustomer.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         jLabel2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel2.setText("Name");
@@ -252,7 +298,7 @@ public class Main extends javax.swing.JFrame {
         cmbGender.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         cmbGender.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Female", "Male" }));
 
-        btnRegister.setBackground(new java.awt.Color(0, 51, 255));
+        btnRegister.setBackground(new java.awt.Color(0, 0, 0));
         btnRegister.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnRegister.setForeground(new java.awt.Color(255, 255, 255));
         btnRegister.setText("Register");
@@ -283,7 +329,7 @@ public class Main extends javax.swing.JFrame {
         jLabel6.setText("Password hint");
 
         jLabel7.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        jLabel7.setText("Email");
+        jLabel7.setText("Emaill");
 
         jLabel8.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jLabel8.setText("National code");
@@ -344,13 +390,17 @@ public class Main extends javax.swing.JFrame {
                             .addComponent(txtBirth))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtPasswordHint, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(panelRegisterCustomerLayout.createSequentialGroup()
                                 .addComponent(jLabel6)
                                 .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(txtAddress, javax.swing.GroupLayout.Alignment.TRAILING)))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRegisterCustomerLayout.createSequentialGroup()
+                                .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                    .addComponent(txtPasswordHint, javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtAddress))
+                                .addContainerGap())))
                     .addGroup(panelRegisterCustomerLayout.createSequentialGroup()
                         .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(txtNcode)
                             .addComponent(jLabel8)
                             .addGroup(panelRegisterCustomerLayout.createSequentialGroup()
                                 .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
@@ -361,12 +411,12 @@ public class Main extends javax.swing.JFrame {
                                         .addComponent(txtName)
                                         .addGap(6, 6, 6)))
                                 .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(txtMobile, javax.swing.GroupLayout.PREFERRED_SIZE, 173, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel3))))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(panelRegisterCustomerLayout.createSequentialGroup()
-                        .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(txtMobile)
+                                    .addGroup(panelRegisterCustomerLayout.createSequentialGroup()
+                                        .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                            .addComponent(jLabel4)
+                                            .addComponent(jLabel3))
+                                        .addGap(0, 0, Short.MAX_VALUE))))
                             .addGroup(panelRegisterCustomerLayout.createSequentialGroup()
                                 .addComponent(btnClear)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -378,12 +428,11 @@ public class Main extends javax.swing.JFrame {
                                     .addComponent(lblDate, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblGender)
                                     .addComponent(cmbGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 22, Short.MAX_VALUE)
                                 .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblPassword, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(lblRegisterUsername, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 237, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addContainerGap())
-                    .addComponent(txtNcode)))
+                        .addContainerGap())))
         );
         panelRegisterCustomerLayout.setVerticalGroup(
             panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -424,13 +473,18 @@ public class Main extends javax.swing.JFrame {
                 .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cmbGender, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblRegisterUsername))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblDate)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnRegister)
-                    .addComponent(btnClear)
-                    .addComponent(btnGeneratePassword)))
+                .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(panelRegisterCustomerLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lblDate)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, panelRegisterCustomerLayout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 34, Short.MAX_VALUE)
+                        .addGroup(panelRegisterCustomerLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnRegister)
+                            .addComponent(btnGeneratePassword)
+                            .addComponent(btnClear))
+                        .addContainerGap())))
         );
 
         jMenu1.setText("File");
@@ -465,13 +519,31 @@ public class Main extends javax.swing.JFrame {
 
         menuShow.setText("Show");
 
-        jMenuItem4.setText("Users");
-        menuShow.add(jMenuItem4);
+        menuItemShowUsers.setText("Users");
+        menuItemShowUsers.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemShowUsersActionPerformed(evt);
+            }
+        });
+        menuShow.add(menuItemShowUsers);
 
-        jMenuItem5.setText("Logs");
-        menuShow.add(jMenuItem5);
+        menuItemShowLogs.setText("Logs");
+        menuItemShowLogs.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemShowLogsActionPerformed(evt);
+            }
+        });
+        menuShow.add(menuItemShowLogs);
 
         jMenu1.add(menuShow);
+
+        menuItemDeleteTransactions.setText("Delete transactions");
+        menuItemDeleteTransactions.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemDeleteTransactionsActionPerformed(evt);
+            }
+        });
+        jMenu1.add(menuItemDeleteTransactions);
 
         menuItemPrint.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         menuItemPrint.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/bms/images/Print.png"))); // NOI18N
@@ -527,6 +599,11 @@ public class Main extends javax.swing.JFrame {
         menuItemSettings.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_S, java.awt.event.InputEvent.CTRL_DOWN_MASK));
         menuItemSettings.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/bms/images/Settings.png"))); // NOI18N
         menuItemSettings.setText("Settings");
+        menuItemSettings.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemSettingsActionPerformed(evt);
+            }
+        });
         jMenu2.add(menuItemSettings);
 
         menuItemExportExcel.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_E, java.awt.event.InputEvent.CTRL_DOWN_MASK));
@@ -539,17 +616,8 @@ public class Main extends javax.swing.JFrame {
         });
         jMenu2.add(menuItemExportExcel);
 
-        menuItemNotepad.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_N, java.awt.event.InputEvent.CTRL_DOWN_MASK));
-        menuItemNotepad.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/bms/images/Notepad.png"))); // NOI18N
-        menuItemNotepad.setText("Notepad");
-        menuItemNotepad.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                menuItemNotepadActionPerformed(evt);
-            }
-        });
-        jMenu2.add(menuItemNotepad);
-
         menuItemTextEncryptor.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_T, java.awt.event.InputEvent.CTRL_DOWN_MASK));
+        menuItemTextEncryptor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/bms/images/Encrypt.png"))); // NOI18N
         menuItemTextEncryptor.setText("Text encryptor");
         menuItemTextEncryptor.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -568,15 +636,20 @@ public class Main extends javax.swing.JFrame {
         menuItemHelp.setText("Help");
         jMenu5.add(menuItemHelp);
 
-        jMenuItem13.setText("Send feedback     ");
-        jMenu5.add(jMenuItem13);
+        menuItemSendFeedback.setText("Send feedback     ");
+        jMenu5.add(menuItemSendFeedback);
 
-        jMenuItem14.setText("Report bug");
-        jMenu5.add(jMenuItem14);
+        menuItemReportBug.setText("Report bug");
+        jMenu5.add(menuItemReportBug);
 
-        jMenuItem15.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/bms/images/About.png"))); // NOI18N
-        jMenuItem15.setText("About");
-        jMenu5.add(jMenuItem15);
+        menuItemAbout.setIcon(new javax.swing.ImageIcon(getClass().getResource("/com/bms/images/About.png"))); // NOI18N
+        menuItemAbout.setText("About");
+        menuItemAbout.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemAboutActionPerformed(evt);
+            }
+        });
+        jMenu5.add(menuItemAbout);
 
         menuItemTest.setText("Test");
         menuItemTest.addActionListener(new java.awt.event.ActionListener() {
@@ -594,7 +667,7 @@ public class Main extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panelTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -611,16 +684,16 @@ public class Main extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cmbSelectTable, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtSearch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(panelRegisterCustomer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
         );
 
         pack();
@@ -643,20 +716,29 @@ public class Main extends javax.swing.JFrame {
 
     private void menuItemCountTableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemCountTableActionPerformed
         int count = 0;
-        
+
         switch (cmbSelectTable.getSelectedIndex()) {
             case 0:
                 count = customerRepository.count();
                 break;
-            
+
             case 1:
                 count = accountRepository.count();
                 break;
-            
+
             case 2:
                 count = employeeRepository.count();
+                break;
+
+            case 3:
+                count = transactionRepository.count();
+                break;
+
+            case 4:
+                count = employeeLogRepository.count();
+                break;
         }
-        
+
         if (count != -1) {
             if (count == 0) {
                 Utils.swingUI.showInformationDialog("There are no records in the table.", "Number of records");
@@ -681,90 +763,90 @@ public class Main extends javax.swing.JFrame {
 
     private void btnRegisterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegisterActionPerformed
         if (txtName.getText().isEmpty()) {
-            txtName.setForeground(Color.RED);
+            txtName.setForeground(Color.decode(Utils.settings.getColorCode()));
             txtName.setText("Name required");
             errors += 1;
         } else {
             txtName.setForeground(Color.BLACK);
         }
-        
+
         if (txtMobile.getText().length() != 11 || !txtMobile.getText().startsWith("09")) {
-            txtMobile.setForeground(Color.RED);
+            txtMobile.setForeground(Color.decode(Utils.settings.getColorCode()));
             txtMobile.setText("Mobile number is invalid");
             errors += 1;
         } else {
             txtMobile.setForeground(Color.BLACK);
         }
-        
+
         if (txtEmail.getText().isEmpty()) {
-            txtEmail.setForeground(Color.RED);
+            txtEmail.setForeground(Color.decode(Utils.settings.getColorCode()));
             txtEmail.setText("Email address required");
             errors += 1;
         } else {
             txtEmail.setForeground(Color.BLACK);
         }
-        
+
         if (txtAddress.getText().isEmpty()) {
-            txtAddress.setForeground(Color.RED);
+            txtAddress.setForeground(Color.decode(Utils.settings.getColorCode()));
             txtAddress.setText("Address required");
             errors += 1;
         } else {
             txtAddress.setForeground(Color.BLACK);
         }
-        
+
         if (txtNcode.getText().length() != 10) {
-            txtNcode.setForeground(Color.RED);
+            txtNcode.setForeground(Color.decode(Utils.settings.getColorCode()));
             txtNcode.setText("National code is invalid");
             errors += 1;
         } else {
             txtNcode.setForeground(Color.BLACK);
         }
-        
+
         if (txtPasswordHint.getText().isEmpty()) {
-            txtPasswordHint.setForeground(Color.RED);
+            txtPasswordHint.setForeground(Color.decode(Utils.settings.getColorCode()));
             txtPasswordHint.setText("Password hint required");
             errors += 1;
         } else {
             txtPasswordHint.setForeground(Color.BLACK);
         }
-        
+
         Customer customer = new Customer();
-        
+
         if (errors == 0) {
-            if (customerRepository.exist(ncode) == 0) {
+            if (customerRepository.exist("ncode", ncode, "") == 0) {
                 try {
-                    customer.setUid(Integer.parseInt(userID));
                     customer.setName(txtName.getText());
                     customer.setMobile(txtMobile.getText());
                     customer.setEmail(txtEmail.getText());
                     customer.setNcode(ncode);
                     customer.setBirth(txtBirth.getText());
                     customer.setAddress(txtAddress.getText());
-                    customer.setUser(Security.encrypt(Utils.ENCRYPT_KEY, username));
-                    customer.setPass(Security.encrypt(Utils.ENCRYPT_KEY, password));
+                    customer.setUser(Security.encrypt(Utils.envs.get("encKey"), username));
+                    customer.setPass(Security.encrypt(Utils.envs.get("encKey"), password));
                     customer.setHint(txtPasswordHint.getText());
                     customer.setDate(date);
                     customer.setGender((short) cmbGender.getSelectedIndex());
                 } catch (Exception e) {
                     Utils.swingUI.showErrorDialog(e.getMessage(), "Customer values failed.");
                 }
-                
+
                 if (customerRepository.addCustomer(customer)) {
+                    Customer c = customerRepository.getCustomer("ncode", ncode);
+
                     Utils.swingUI.showInformationDialog("The new customer added to the database successfully.\n"
-                            + "The customer user id is " + userID, "Customer added successfully.");
-                    
+                            + "The customer id is " + c.getId() + ".", "Customer added successfully.");
+
                     Utils.envs.put("created", "1");
                     btnClearActionPerformed(evt);
-                    
+
                     password = Utils.generateCustomerPassword(lblPassword);
-                    userID = Utils.generateUserID(null);
-                    cmbSelectTable.setSelectedIndex(0);
+                    Utils.envs.put("tableUpdate", "1");
                 }
             } else {
                 Utils.swingUI.showConfirmDialog("The customer already exist in the database.", "Customer exist",
                         new Object[]{"Ok"});
             }
-            
+
         } else {
             errors = 0;
         }
@@ -785,9 +867,9 @@ public class Main extends javax.swing.JFrame {
 
     private void menuItemExportExcelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemExportExcelActionPerformed
         try {
-            File file = Utils.swingUI.showSaveDialog("Select file location", Utils.envs.get("home"),
+            File file = Utils.swingUI.showSaveDialog("Select file location", Utils.settings.getDialogPath(),
                     new FileNameExtensionFilter[]{new FileNameExtensionFilter("Microsoft excel files", "xlsx")});
-            
+
             if (!Objects.isNull(file)) {
                 Utils.dBRepository.exportTableToExcelFile(tableMain, 5, file.getAbsolutePath());
                 Utils.swingUI.showInformationDialog("The table exported successfully.", "Table exported");
@@ -821,35 +903,122 @@ public class Main extends javax.swing.JFrame {
     private void menuItemPrintActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPrintActionPerformed
         try {
             String title = null;
-            
+
             switch (cmbSelectTable.getSelectedIndex()) {
                 case 0:
                     title = "Customers";
                     break;
-                
+
                 case 1:
                     title = "Accounts";
                     break;
-                
+
                 case 2:
                     title = "Employees";
                     break;
+
+                case 3:
+                    title = "Transactions";
+                    break;
+
+                case 4:
+                    title = "Loans";
+                    break;
             }
-            
+
             Utils.swingUI.printTable(tableMain, title, "Page{0,number,integer}");
         } catch (PrinterException e) {
             Utils.swingUI.showErrorDialog("Unable to print the table.\n" + e.getMessage(), "Print failed");
         }
     }//GEN-LAST:event_menuItemPrintActionPerformed
 
-    private void menuItemNotepadActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemNotepadActionPerformed
-        new Notepad(this, true).setVisible(true);
-    }//GEN-LAST:event_menuItemNotepadActionPerformed
-
     private void menuItemLoanActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemLoanActionPerformed
-        // TODO add your handling code here:
+        new NewLoan(this, true).setVisible(true);
     }//GEN-LAST:event_menuItemLoanActionPerformed
-    
+
+    private void tableMainMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tableMainMouseClicked
+        if (tableMain.getSelectedRow() != -1) {
+            if (evt.getClickCount() == 1) {
+                switch (cmbSelectTable.getSelectedIndex()) {
+                    case 0:
+                        customer.setId(Integer.parseInt(tableMain.getValueAt(tableMain.getSelectedRow(), 0).toString()));
+                        customer.setName(tableMain.getValueAt(tableMain.getSelectedRow(), 1).toString());
+                        customer.setMobile(tableMain.getValueAt(tableMain.getSelectedRow(), 2).toString());
+                        customer.setNcode(tableMain.getValueAt(tableMain.getSelectedRow(), 3).toString());
+                        customer.setDate(tableMain.getValueAt(tableMain.getSelectedRow(), 4).toString());
+                        break;
+
+                    case 1:
+                        account.setId(Integer.parseInt(tableMain.getValueAt(tableMain.getSelectedRow(), 0).toString()));
+                        account.setFid(Integer.parseInt(tableMain.getValueAt(tableMain.getSelectedRow(), 1).toString()));
+                        account.setAcn(tableMain.getValueAt(tableMain.getSelectedRow(), 2).toString());
+                        account.setMoney(tableMain.getValueAt(tableMain.getSelectedRow(), 3).toString());
+                        break;
+
+                    case 2:
+                        employee.setId(Integer.parseInt(tableMain.getValueAt(tableMain.getSelectedRow(), 0).toString()));
+                        employee.setName(tableMain.getValueAt(tableMain.getSelectedRow(), 1).toString());
+                        employee.setMobile(tableMain.getValueAt(tableMain.getSelectedRow(), 2).toString());
+                        employee.setNcode(tableMain.getValueAt(tableMain.getSelectedRow(), 3).toString());
+                        break;
+                }
+            } else if (evt.getClickCount() == 2) {
+                switch (cmbSelectTable.getSelectedIndex()) {
+                    case 0:
+                        new EditCustomer(Main.this, true, customer).setVisible(true);
+                        break;
+
+                    case 1:
+                        new EditAccount(this, true, account).setVisible(true);
+                        break;
+
+                    case 2:
+                        new EditEmployee(this, true, employee).setVisible(true);
+                }
+            }
+        }
+    }//GEN-LAST:event_tableMainMouseClicked
+
+    private void menuItemShowUsersActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemShowUsersActionPerformed
+        if (customerLogRepository.count() == 0 && employeeRepository.count() == 0) {
+            Utils.swingUI.showInformationDialog("There is no user to display.", "No user");
+        } else {
+            new ShowUsers(this, true).setVisible(true);
+        }
+    }//GEN-LAST:event_menuItemShowUsersActionPerformed
+
+    private void menuItemDeleteTransactionsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemDeleteTransactionsActionPerformed
+        new AskDialog(this, true, "pass", "").setVisible(true);
+        if (!Objects.isNull(Utils.publicAskItem)) {
+            if (Utils.publicAskItem.equals("ok")) {
+                if (Utils.swingUI.showConfirmDialog("Are you sure you want to delete all accounts transaction?\n"
+                        + "Changes can't be undo", "Delete all transactions", new Object[]{"Delete all", "Cancel"})) {
+
+                    if (transactionRepository.deleteAll()) {
+                        Utils.envs.put("tableUpdate", "4");
+                        Utils.swingUI.showInformationDialog("All the transactions deleted successfully.", "Transactions delete.");
+                    }
+                }
+            }
+        }
+    }//GEN-LAST:event_menuItemDeleteTransactionsActionPerformed
+
+    private void menuItemShowLogsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemShowLogsActionPerformed
+        if (customerLogRepository.count() == 0 && employeeLogRepository.count() == 0) {
+            Utils.swingUI.showInformationDialog("There is no new log to display", "No log");
+        } else {
+            new ShowLogs(this, true).setVisible(true);
+        }
+    }//GEN-LAST:event_menuItemShowLogsActionPerformed
+
+    private void menuItemSettingsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemSettingsActionPerformed
+        new Settings(this, true).setVisible(true);
+    }//GEN-LAST:event_menuItemSettingsActionPerformed
+
+    private void menuItemAboutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemAboutActionPerformed
+        new About(this, true).setVisible(true);
+    }//GEN-LAST:event_menuItemAboutActionPerformed
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -881,7 +1050,7 @@ public class Main extends javax.swing.JFrame {
             }
         });
     }
-    
+
     private void checkUsernameLabel() {
         if (txtNcode.getText().isEmpty()) {
             lblRegisterUsername.setVisible(false);
@@ -892,52 +1061,79 @@ public class Main extends javax.swing.JFrame {
             ncode = txtNcode.getText();
         }
     }
-    
+
     private void loadFrameContent() {
         Utils.swingUI.setJFrameCenter(this);
         Utils.swingUI.makeJFrameMovable(this);
-        
+
+        menuItemSendFeedback.setVisible(false);
+        menuItemReportBug.setVisible(false);
+        menuItemTest.setVisible(false);
+
         lblBuild.setText("Build " + Utils.envs.get("build"));
         lblTime.setText("Up time : " + Utils.envs.get("time"));
-        
+
         ActionListener taskPerformer = (ActionEvent evt) -> {
             boot.loadSystemTime().loadSystemDate().loadSystemUserHomeDirectory();
             lblTime.setText("Up time : " + Utils.envs.get("time"));
             lblDate.setText("Date: " + Utils.envs.get("date"));
             date = Utils.envs.get("date");
-            
+
+            panelTitle.setBackground(Color.decode(Utils.settings.getColorCode()));
+            btnRegister.setBackground(Color.decode(Utils.settings.getColorCode()));
+            tableMain.setSelectionBackground(Color.decode(Utils.settings.getColorCode()));
+
             checkUsernameLabel();
-            
-            if (Utils.envs.containsKey("created")) {
-                switch (Utils.envs.get("created")) {
-                    case "1":
-                        cmbSelectTable.setSelectedIndex(0);
+
+            if (Utils.envs.containsKey("tableUpdate")) {
+                int index = Integer.parseInt(Utils.envs.get("tableUpdate"));
+
+                switch (index) {
+                    case 1:
                         loadCustomers();
-                        Utils.envs.remove("created", "1");
                         break;
-                    
-                    case "2":
+
+                    case 2:
+                        loadAccounts();
                         break;
-                    
-                    case "3":
-                        cmbSelectTable.setSelectedIndex(2);
+
+                    case 3:
                         loadEmployess();
-                        Utils.envs.remove("created", "3");
+                        break;
+
+                    case 4:
+                        loadTransactions();
+                        break;
+
+                    case 5:
+                        loadLoans();
                         break;
                 }
-                
+
+                cmbSelectTable.setSelectedIndex(index - 1);
+                Utils.envs.remove("tableUpdate");
+            }
+
+            if (Utils.envs.containsKey("tableRecordUpdate")) {
+                loadAll();
+
+                if (!Utils.settings.getTableRecords().equals("-1")) {
+                    correctTableRows();
+                }
+
+                Utils.envs.remove("tableRecordUpdate");
             }
         };
-        
+
         Timer timer = new Timer(500, taskPerformer);
         timer.setRepeats(true);
         timer.start();
-        
+
         th = tableMain.getTableHeader();
         Utils.swingUI.setTableNoneEditable(tableMain);
         tableMain.getTableHeader().setFont(new Font("Tahoma", Font.PLAIN, 12));
         lblRegisterUsername.setVisible(false);
-        
+
         Utils.swingUI.setJTextFieldLimit(txtName, 100);
         Utils.swingUI.setJTextFieldLimit(txtMobile, 11);
         Utils.swingUI.setJTextFieldLimit(txtEmail, 100);
@@ -945,11 +1141,12 @@ public class Main extends javax.swing.JFrame {
         Utils.swingUI.setJTextFieldLimit(txtAddress, 150);
         Utils.swingUI.setJTextFieldLimit(txtPasswordHint, 20);
         Utils.swingUI.setJTextFieldLimit(txtNcode, 10);
-        
+
         Utils.swingUI.setJTextFieldInputType(txtMobile, "number");
         Utils.swingUI.setJTextFieldInputType(txtNcode, "number");
+
     }
-    
+
     private void login() {
         while (true) {
             this.setVisible(false);
@@ -960,107 +1157,132 @@ public class Main extends javax.swing.JFrame {
                 break;
             }
         }
-        
+
         this.setVisible(true);
     }
-    
+
     private void loadDatabaseConnection() {
         internet = new Internet("http://www.google.com");
-        
+
         if (Objects.isNull(Utils.connection)) {
             String message = "Unable to connect to the database.\n";
-            
+
             if (internet.isInternetConnected()) {
                 message += "Please contact the manager to solve problem.";
             } else {
                 message += "The internet is not connected.";
             }
-            
+
             Utils.swingUI.showErrorDialog(message, "Database connection failed");
             System.exit(1);
         }
     }
-    
+
     private void loadCustomers() {
-        customerRepository = new CustomerRepository();
-        customerRepository.loadCustomers(tableMain);
+        customerRepository.loadCustomers(tableMain, new String[]{"id", "name", "mobile", "ncode", "date"});
         List<Object> items = new ArrayList<>();
-        
+
         TableColumnModel tcm = th.getColumnModel();
-        
-        for (int i = 0; i < CUSTOMER_COLUMNS.length; i++) {
+
+        for (int i = 0; i < Utils.CUSTOMER_COLUMNS.length; i++) {
             TableColumn tc = tcm.getColumn(i);
-            tc.setHeaderValue(CUSTOMER_COLUMNS[i]);
+            tc.setHeaderValue(Utils.CUSTOMER_COLUMNS[i]);
             th.repaint();
         }
 
-//        for (int j = 0; j < Utils.swingUI.countTableColumns(tableMain); j++) {
-//            for (int i = 0; i < Utils.swingUI.countTableRows(tableMain); i++) {
-//                items.add(tableMain.getValueAt(i, j));
-//            }
-//
-//            int biggest = Utils.strings.findBiggestItem(Utils.strings.objectArrayToStringArray(items.toArray())).length();
-//            items.clear();
-//            
-//            tableMain.getColumnModel().getColumn(j).setPreferredWidth(biggest);
-//            System.out.println(biggest);
-//        }
         tableMain.getColumnModel().getColumn(0).setPreferredWidth(25);
         tableMain.getColumnModel().getColumn(1).setPreferredWidth(45);
         tableMain.getColumnModel().getColumn(2).setPreferredWidth(50);
         tableMain.getColumnModel().getColumn(3).setPreferredWidth(70);
         tableMain.getColumnModel().getColumn(4).setPreferredWidth(65);
-        tableMain.getColumnModel().getColumn(5).setPreferredWidth(65);
     }
-    
+
     private void loadAccounts() {
-        accountRepository = new AccountRepository();
-        accountRepository.loadAccounts(tableMain);
-        
+        accountRepository.loadAccounts(tableMain, new String[]{"id", "fid", "acn", "money"});
+
         TableColumnModel tcm = th.getColumnModel();
-        
-        for (int i = 0; i < ACCOUNT_COLUMNS.length; i++) {
+
+        for (int i = 0; i < Utils.ACCOUNT_COLUMNS.length; i++) {
             TableColumn tc = tcm.getColumn(i);
-            tc.setHeaderValue(ACCOUNT_COLUMNS[i]);
+            tc.setHeaderValue(Utils.ACCOUNT_COLUMNS[i]);
             th.repaint();
         }
     }
-    
+
     private void loadEmployess() {
-        employeeRepository = new EmployeeRepository();
-        employeeRepository.loadEmployees(tableMain);
-        
+        employeeRepository.loadEmployees(tableMain, new String[]{"id", "name", "mobile", "ncode", "date"});
+
         TableColumnModel tcm = th.getColumnModel();
-        
-        for (int i = 0; i < EMPLOYEE_COLUMNS.length; i++) {
+
+        for (int i = 0; i < Utils.EMPLOYEE_COLUMNS.length; i++) {
             TableColumn tc = tcm.getColumn(i);
-            tc.setHeaderValue(EMPLOYEE_COLUMNS[i]);
+            tc.setHeaderValue(Utils.EMPLOYEE_COLUMNS[i]);
             th.repaint();
         }
     }
-    
+
     private void loadTransactions() {
+        transactionRepository.loadTransactions(tableMain, new String[]{"id", "fid", "sourceacn", "destacn", "date"});
+
+        TableColumnModel tcm = th.getColumnModel();
+
+        for (int i = 0; i < Utils.TRANSACTION_COLUMNS.length; i++) {
+            TableColumn tc = tcm.getColumn(i);
+            tc.setHeaderValue(Utils.TRANSACTION_COLUMNS[i]);
+            th.repaint();
+        }
     }
-    
-    private void loadLogs() {
+
+    private void loadLoans() {
+        loanRepository.loadLoans(tableMain, new String[]{"id", "fid", "amount", "startdate", "enddate"});
+
+        TableColumnModel tcm = th.getColumnModel();
+
+        for (int i = 0; i < Utils.LOANS_COLUMNS.length; i++) {
+            TableColumn tc = tcm.getColumn(i);
+            tc.setHeaderValue(Utils.LOANS_COLUMNS[i]);
+            th.repaint();
+        }
     }
-    
+
     private void loadAll() {
+        tableMain.setRowSorter(null);
+        
         switch (cmbSelectTable.getSelectedIndex()) {
             case 0:
                 loadCustomers();
                 break;
-            
+
             case 1:
                 loadAccounts();
                 break;
-            
+
             case 2:
                 loadEmployess();
                 break;
-            
+
             case 3:
+                loadTransactions();
                 break;
+
+            case 4:
+                loadLoans();
+                break;
+        }
+    }
+
+    private void correctTableRows() {
+        int number = Integer.parseInt(Utils.settings.getTableRecords()),
+                rows = (int) Utils.swingUI.countTableRows(tableMain);
+
+        if (rows > number) {
+            DefaultTableModel dtm = (DefaultTableModel) tableMain.getModel();
+
+            for (int i = rows - 1; i > number - 1; i--) {
+                dtm.removeRow(i);
+            }
+
+            tableMain.setModel(dtm);
         }
     }
 
@@ -1082,12 +1304,6 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu5;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem13;
-    private javax.swing.JMenuItem jMenuItem14;
-    private javax.swing.JMenuItem jMenuItem15;
-    private javax.swing.JMenuItem jMenuItem4;
-    private javax.swing.JMenuItem jMenuItem5;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblBuild;
     private javax.swing.JLabel lblDate;
@@ -1097,22 +1313,28 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JLabel lblTime;
     private javax.swing.JLabel lblUsername;
     private javax.swing.JMenu menuAddNew;
+    private javax.swing.JMenuItem menuItemAbout;
     private javax.swing.JMenuItem menuItemAccount;
     private javax.swing.JMenuItem menuItemCountTable;
+    private javax.swing.JMenuItem menuItemDeleteTransactions;
     private javax.swing.JMenuItem menuItemEmployee;
     private javax.swing.JMenuItem menuItemExit;
     private javax.swing.JMenuItem menuItemExportExcel;
     private javax.swing.JMenuItem menuItemHelp;
     private javax.swing.JMenuItem menuItemLoan;
     private javax.swing.JMenuItem menuItemLogout;
-    private javax.swing.JMenuItem menuItemNotepad;
     private javax.swing.JMenuItem menuItemPrint;
     private javax.swing.JMenuItem menuItemRefresh;
+    private javax.swing.JMenuItem menuItemReportBug;
+    private javax.swing.JMenuItem menuItemSendFeedback;
     private javax.swing.JMenuItem menuItemSettings;
+    private javax.swing.JMenuItem menuItemShowLogs;
+    private javax.swing.JMenuItem menuItemShowUsers;
     private javax.swing.JMenuItem menuItemTest;
     private javax.swing.JMenuItem menuItemTextEncryptor;
     private javax.swing.JMenu menuShow;
     private javax.swing.JPanel panelRegisterCustomer;
+    private javax.swing.JPanel panelTitle;
     private javax.swing.JTable tableMain;
     private javax.swing.JTextField txtAddress;
     private javax.swing.JFormattedTextField txtBirth;

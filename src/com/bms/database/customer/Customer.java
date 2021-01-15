@@ -2,7 +2,6 @@ package com.bms.database.customer;
 
 public class Customer {
     private int id;
-    private int uid;
 
     private String name;
     private String mobile;
@@ -24,14 +23,6 @@ public class Customer {
 
     public void setId(int id) {
         this.id = id;
-    }
-
-    public int getUid() {
-        return uid;
-    }
-
-    public void setUid(int uid) {
-        this.uid = uid;
     }
 
     public String getName() {

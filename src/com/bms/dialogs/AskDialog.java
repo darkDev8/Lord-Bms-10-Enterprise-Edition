@@ -4,6 +4,8 @@ import com.bms.database.account.AccountRepository;
 import com.bms.database.customer.CustomerRepository;
 import com.bms.database.employee.EmployeeRepository;
 import com.bms.utility.Utils;
+import com.sdk.datatypes.Characters;
+import java.awt.Color;
 import java.awt.event.KeyEvent;
 
 public class AskDialog extends javax.swing.JDialog {
@@ -23,9 +25,10 @@ public class AskDialog extends javax.swing.JDialog {
         this.object = object;
 
         Utils.swingUI.setJDialogCenter(this);
-
         Utils.swingUI.setJDialogCloseESC(this);
         Utils.swingUI.makeJDialogMovable(this);
+
+        btnOk.setBackground(Color.decode(Utils.settings.getColorCode()));
 
         accountRepository = new AccountRepository();
         employeeRepository = new EmployeeRepository();
@@ -35,16 +38,31 @@ public class AskDialog extends javax.swing.JDialog {
                 lblAskMessage.setText("National code");
                 Utils.swingUI.setJTextFieldLimit(txtItem, 10);
                 Utils.swingUI.setJTextFieldInputType(txtItem, "number");
+                txtItem.setEchoChar((char) 0);
+                this.setTitle("National code");
                 break;
 
             case "fname":
                 lblAskMessage.setText("File name");
+                txtItem.setEchoChar((char) 0);
+                this.setTitle("File name");
                 break;
 
             case "count":
+            case "text":
+                txtItem.setText(this.object);
             case "remove":
                 lblAskMessage.setText("Input text");
+                txtItem.setEchoChar((char) 0);
+                this.setTitle("Input text");
                 break;
+
+            case "pass":
+                lblAskMessage.setText("Password");
+                txtItem.setEchoChar('*');
+                this.setTitle("Manager password");
+                break;
+
         }
     }
 
@@ -53,24 +71,18 @@ public class AskDialog extends javax.swing.JDialog {
     private void initComponents() {
 
         lblAskMessage = new javax.swing.JLabel();
-        txtItem = new javax.swing.JTextField();
         btnOk = new javax.swing.JButton();
         btnCancel = new javax.swing.JButton();
+        txtItem = new javax.swing.JPasswordField();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Title");
         setResizable(false);
 
         lblAskMessage.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         lblAskMessage.setText("Message");
 
-        txtItem.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
-        txtItem.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyPressed(java.awt.event.KeyEvent evt) {
-                txtItemKeyPressed(evt);
-            }
-        });
-
-        btnOk.setBackground(new java.awt.Color(51, 51, 255));
+        btnOk.setBackground(new java.awt.Color(0, 0, 0));
         btnOk.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         btnOk.setForeground(java.awt.Color.white);
         btnOk.setText("Ok");
@@ -90,16 +102,22 @@ public class AskDialog extends javax.swing.JDialog {
             }
         });
 
+        txtItem.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                txtItemKeyPressed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblAskMessage, javax.swing.GroupLayout.DEFAULT_SIZE, 206, Short.MAX_VALUE)
-                    .addComponent(txtItem, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txtItem)
+                    .addComponent(lblAskMessage, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 211, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(btnCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -127,15 +145,15 @@ public class AskDialog extends javax.swing.JDialog {
         beginProcess();
     }//GEN-LAST:event_btnOkActionPerformed
 
-    private void txtItemKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtItemKeyPressed
-        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-            beginProcess();
-        }
-    }//GEN-LAST:event_txtItemKeyPressed
-
     private void btnCancelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCancelActionPerformed
         this.dispose();
     }//GEN-LAST:event_btnCancelActionPerformed
+
+    private void txtItemKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtItemKeyPressed
+        if (evt.getKeyChar() == KeyEvent.VK_ENTER) {
+            beginProcess();
+        }
+    }//GEN-LAST:event_txtItemKeyPressed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -178,18 +196,20 @@ public class AskDialog extends javax.swing.JDialog {
     }
 
     private void beginProcess() {
+        String text = new Characters().convertCharArrayToString(txtItem.getPassword());
+
         switch (mode) {
             case "ncode": {
-                if (txtItem.getText().length() != 10) {
+                if (text.length() != 10) {
                     Utils.swingUI.showErrorDialog("The national is invalid.\nNational code must be 10 digits.", "Invalid national code");
                 } else {
                     switch (object) {
                         case "employee":
-                            if (employeeRepository.exist(txtItem.getText()) == 1) {
+                            if (employeeRepository.exist("ncode", txtItem.getText(), "") == 1) {
                                 Utils.swingUI.showConfirmDialog("The employee already exist in the database.", "Employee exist",
                                         new Object[]{"Ok"});
                             } else {
-                                Utils.publicAskItem = txtItem.getText();
+                                Utils.publicAskItem = text;
                                 this.dispose();
                             }
                             break;
@@ -202,21 +222,22 @@ public class AskDialog extends javax.swing.JDialog {
                 break;
             }
 
-            case "fname":
-                if (txtItem.getText().isEmpty()) {
+            case "fname": {
+                if (text.isEmpty()) {
                     Utils.swingUI.showConfirmDialog("The file name can't be empty.", "Enter file name", new Object[]{"Ok"});
                 } else {
-                    Utils.publicAskItem = txtItem.getText();
+                    Utils.publicAskItem = text;
                     this.dispose();
                 }
 
                 break;
+            }
 
-            case "count":
-                if (txtItem.getText().isEmpty()) {
+            case "count": {
+                if (text.isEmpty()) {
                     Utils.swingUI.showConfirmDialog("Please enter the specified text.", "No input", new Object[]{"Ok"});
                 } else {
-                    int count = Utils.strings.repeatWords(object, txtItem.getText());
+                    int count = Utils.strings.repeatWords(object, text);
 
                     if (count == 0) {
                         Utils.swingUI.showInformationDialog("No matches found", "No matches");
@@ -228,16 +249,43 @@ public class AskDialog extends javax.swing.JDialog {
                 }
 
                 break;
+            }
 
-            case "remove":
-                if (txtItem.getText().isEmpty()) {
+            case "remove": {
+                if (text.isEmpty()) {
                     Utils.swingUI.showConfirmDialog("Please enter the specified text.", "No input", new Object[]{"Ok"});
                 } else {
-                    Utils.envs.put("remove", object.replace(txtItem.getText(), Utils.strings.getEmptyString()));
+                    Utils.envs.put("remove", object.replace(text, Utils.strings.getEmptyString()));
                     this.dispose();
                 }
 
                 break;
+            }
+
+            case "pass": {
+                if (text.isEmpty()) {
+                    Utils.swingUI.showConfirmDialog("Enter the manager password.", "No password", new Object[]{"Ok"});
+                } else {
+                    if (text.equals(Utils.envs.get("manager"))) {
+                        Utils.publicAskItem = "ok";
+                        this.dispose();
+                    } else {
+                        Utils.swingUI.showErrorDialog("The password is incorrect.", "Incorrect password");
+                        Utils.publicAskItem = null;
+                    }
+                }
+                break;
+            }
+
+            case "text": {
+                if (text.isEmpty()) {
+                    Utils.swingUI.showConfirmDialog("Please enter the specified text.", "No input", new Object[]{"Ok"});
+                } else {
+                    Utils.publicAskItem = "ok";
+                    Utils.envs.put("sampleText", txtItem.getText());
+                    this.dispose();
+                }
+            }
         }
     }
 
@@ -245,6 +293,6 @@ public class AskDialog extends javax.swing.JDialog {
     private javax.swing.JButton btnCancel;
     private javax.swing.JButton btnOk;
     private javax.swing.JLabel lblAskMessage;
-    private javax.swing.JTextField txtItem;
+    private javax.swing.JPasswordField txtItem;
     // End of variables declaration//GEN-END:variables
 }

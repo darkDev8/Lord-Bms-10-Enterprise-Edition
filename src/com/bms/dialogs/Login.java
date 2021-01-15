@@ -3,9 +3,11 @@ package com.bms.dialogs;
 import com.bms.database.customer.CustomerRepository;
 import com.bms.database.employee.EmployeeRepository;
 import com.bms.utility.Utils;
+import static com.bms.utility.Utils.envs;
 import com.sdk.datatypes.Characters;
 import com.sdk.datatypes.Strings;
 import com.sdk.security.Security;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
 
@@ -24,6 +26,8 @@ public class Login extends javax.swing.JDialog {
         Utils.swingUI.setJDialogCenter(this);
         Utils.swingUI.setJDialogCloseESC(this);
         Utils.swingUI.makeJDialogMovable(this);
+        
+        btnLogin.setBackground(Color.decode(Utils.settings.getColorCode()));
     }
 
     @SuppressWarnings("unchecked")
@@ -39,6 +43,7 @@ public class Login extends javax.swing.JDialog {
         btnLogin = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Login");
         setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -73,7 +78,7 @@ public class Login extends javax.swing.JDialog {
             }
         });
 
-        btnLogin.setBackground(new java.awt.Color(0, 51, 255));
+        btnLogin.setBackground(new java.awt.Color(0, 0, 0));
         btnLogin.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnLogin.setForeground(new java.awt.Color(255, 255, 255));
         btnLogin.setText("Login");
@@ -197,24 +202,24 @@ public class Login extends javax.swing.JDialog {
     }
 
     private void login() {
-        if (!txtUsername.getText().isEmpty() && !characters.convertCharArrayToString(txtPassword.getPassword()).isEmpty()) {
-            try {
-                if (employeeRepository.usernameExist(Security.encrypt(Utils.ENCRYPT_KEY, txtUsername.getText())) == 1
-                        && employeeRepository.passwordExist(Security.encrypt(Utils.ENCRYPT_KEY, characters.convertCharArrayToString(txtPassword.getPassword()))) == 1) {
-
-                    Utils.login = true;
-                    this.dispose();
-                } else {
-                    System.out.println(Security.decrypt(Utils.ENCRYPT_KEY, txtUsername.getText()));
-                    System.out.println(Security.decrypt(Utils.ENCRYPT_KEY, characters.convertCharArrayToString(txtPassword.getPassword())));
-
-                    Utils.swingUI.showErrorDialog("The username or password is incorrect.", "Incorrect username or password.");
-
-                }
-            } catch (Exception e) {
-                Utils.swingUI.showErrorDialog("Unalbe to fetch data from database.\n" + e.getMessage(), "Fetching information failed");
-            }
-        }
+//        if (!txtUsername.getText().isEmpty() && !characters.convertCharArrayToString(txtPassword.getPassword()).isEmpty()) {
+//            try {
+//                if (employeeRepository.usernameExist(Security.encrypt(Utils.envs.get("encKey"), txtUsername.getText())) == 1
+//                        && employeeRepository.passwordExist(Security.encrypt(Utils.envs.get("encKey"), characters.convertCharArrayToString(txtPassword.getPassword()))) == 1) {
+//
+//                    Utils.login = true;
+//                    this.dispose();
+//                } else {
+//                    System.out.println(Security.decrypt(Utils.envs.get("encKey"), txtUsername.getText()));
+//                    System.out.println(Security.decrypt(Utils.envs.get("encKey"), characters.convertCharArrayToString(txtPassword.getPassword())));
+//
+//                    Utils.swingUI.showErrorDialog("The username or password is incorrect.", "Incorrect username or password.");
+//
+//                }
+//            } catch (Exception e) {
+//                Utils.swingUI.showErrorDialog("Unalbe to fetch data from database.\n" + e.getMessage(), "Fetching information failed");
+//            }
+//        }
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

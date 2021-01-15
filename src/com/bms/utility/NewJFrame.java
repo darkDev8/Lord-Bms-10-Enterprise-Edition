@@ -6,6 +6,10 @@
 package com.bms.utility;
 
 import com.bms.database.customer.CustomerRepository;
+import com.bms.root.Boot;
+import com.sdk.security.Security;
+import com.sdk.storage.files.DirectFile;
+import com.sdk.storage.files.TextFile;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -20,13 +24,18 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.print.PrinterException;
+import java.io.Console;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.AbstractAction;
@@ -79,8 +88,17 @@ public class NewJFrame extends javax.swing.JFrame {
 
     DefaultTableModel dtm = new DefaultTableModel();
 
+    private Settings settings;
+    private TextFile textFile = new TextFile("config.xml");
+
     public NewJFrame() {
         initComponents();
+
+//        settings = new Settings();
+//        settings.setTableRecords(20);
+//        settings.setDialogPath("E:\\musics");
+//        settings.setCloseRegister(true);
+//        settings.setColorCode("#009945");
 
         Container contentPane = getContentPane();
         contentPane.addMouseListener(new MouseAdapter() {
@@ -100,7 +118,6 @@ public class NewJFrame extends javax.swing.JFrame {
 //
 //        init();
 //        jTextField1.setComponentPopupMenu(popupMenu);
-
 
     }
 
@@ -124,8 +141,12 @@ public class NewJFrame extends javax.swing.JFrame {
         item.setPreferredSize(new Dimension(100, 20));
 
         popupMenu.add(item);
-        
+
         jPopupMenu1.add(new JMenuItem("ssss"));
+        
+        jMenuItem1.setForeground(Color.red);
+        
+        jMenu1.setForeground(Color.red);
     }
 
     private void addAction(TextAction action, int key, String text) {
@@ -164,6 +185,16 @@ public class NewJFrame extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
         jPanel1 = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
+        jTextField3 = new javax.swing.JTextField();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        jMenu1 = new javax.swing.JMenu();
+        jMenuItem5 = new javax.swing.JMenuItem();
+        jMenuItem6 = new javax.swing.JMenuItem();
+        jMenuItem7 = new javax.swing.JMenuItem();
+        jMenu2 = new javax.swing.JMenu();
 
         jPopupMenu1.setInheritsPopupMenu(true);
 
@@ -249,7 +280,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addGroup(jInternalFrame1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jCheckBox1)
                     .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(30, Short.MAX_VALUE))
+                .addContainerGap(98, Short.MAX_VALUE))
         );
 
         jInternalFrame2.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -284,7 +315,7 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel3)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 287, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 304, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -301,6 +332,37 @@ public class NewJFrame extends javax.swing.JFrame {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
+        jButton1.setText("jButton1");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setRows(5);
+        jScrollPane2.setViewportView(jTextArea1);
+
+        jTextField3.setText("jTextField3");
+
+        jMenu1.setText("File");
+
+        jMenuItem5.setText("jMenuItem5");
+        jMenu1.add(jMenuItem5);
+
+        jMenuItem6.setText("jMenuItem5");
+        jMenu1.add(jMenuItem6);
+
+        jMenuItem7.setText("jMenuItem5");
+        jMenu1.add(jMenuItem7);
+
+        jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Edit");
+        jMenuBar1.add(jMenu2);
+
+        setJMenuBar(jMenuBar1);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -310,8 +372,18 @@ public class NewJFrame extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(jInternalFrame1)
                     .addComponent(jInternalFrame2))
-                .addGap(154, 154, 154)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(56, 56, 56)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(38, 38, 38)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 73, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -324,8 +396,18 @@ public class NewJFrame extends javax.swing.JFrame {
                         .addGap(70, 70, 70)
                         .addComponent(jInternalFrame2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(159, 159, 159)
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(159, 159, 159)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(70, 70, 70))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(144, 144, 144)))
+                        .addComponent(jButton1)
+                        .addGap(93, 93, 93)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -339,6 +421,33 @@ public class NewJFrame extends javax.swing.JFrame {
     private void formMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMousePressed
 
     }//GEN-LAST:event_formMousePressed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+      //  saveSettings();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+//    private void saveSettings() {
+//        try {
+//            if (!textFile.exist()) {
+//                textFile.create();
+//            }
+//
+//            Properties props = new Properties();
+//
+//            props.setProperty("tableNumber", String.valueOf(settings.getTableRecords()));
+//            props.setProperty("dialogPath", settings.getDialogPath());
+//            props.setProperty("closeRegister", String.valueOf(settings.isCloseRegister()));
+//            props.setProperty("appColor", settings.getColorCode());
+//
+//            OutputStream outputStream = new FileOutputStream(new File("config.xml"));
+//            props.storeToXML(outputStream, "Settings values");
+//            outputStream.close();
+//
+//            new Boot().loadSettings();
+//        } catch (Exception e) {
+//            Utils.swingUI.showErrorDialog("Unable to save settings in the file.\n" + e.getMessage(), "Save failed");
+//        }
+//    }
 
     void showPopup(MouseEvent me) {
 
@@ -378,6 +487,7 @@ public class NewJFrame extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cmbType;
+    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton3;
     private javax.swing.JCheckBox jCheckBox1;
     private javax.swing.JFrame jFrame1;
@@ -387,15 +497,24 @@ public class NewJFrame extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JList<String> jList1;
+    private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JMenuItem jMenuItem4;
+    private javax.swing.JMenuItem jMenuItem5;
+    private javax.swing.JMenuItem jMenuItem6;
+    private javax.swing.JMenuItem jMenuItem7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu jPopupMenu1;
     private javax.swing.JPopupMenu jPopupMenu2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JTextField jTextField1;
     private javax.swing.JTextField jTextField2;
+    private javax.swing.JTextField jTextField3;
     // End of variables declaration//GEN-END:variables
 }

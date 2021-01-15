@@ -1,8 +1,10 @@
 package com.bms.dialogs;
 
 import com.bms.utility.Utils;
+import static com.bms.utility.Utils.envs;
 import com.sdk.datatypes.Strings;
 import com.sdk.security.Security;
+import java.awt.Color;
 
 public class TextEncryptor extends javax.swing.JDialog {
     
@@ -13,6 +15,8 @@ public class TextEncryptor extends javax.swing.JDialog {
         Utils.swingUI.setJDialogCenter(this);
         Utils.swingUI.setJDialogCloseESC(this);
         Utils.swingUI.makeJDialogMovable(this);
+        
+        btnBegin.setBackground(Color.decode(Utils.settings.getColorCode()));
     }
 
     @SuppressWarnings("unchecked")
@@ -30,6 +34,7 @@ public class TextEncryptor extends javax.swing.JDialog {
         btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Text encryptor");
         setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
@@ -47,7 +52,7 @@ public class TextEncryptor extends javax.swing.JDialog {
         txtOutput.setRows(5);
         jScrollPane2.setViewportView(txtOutput);
 
-        btnBegin.setBackground(new java.awt.Color(0, 51, 255));
+        btnBegin.setBackground(new java.awt.Color(0, 0, 0));
         btnBegin.setFont(new java.awt.Font("Tahoma", 1, 12)); // NOI18N
         btnBegin.setForeground(new java.awt.Color(255, 255, 255));
         btnBegin.setText("Begin");
@@ -117,7 +122,7 @@ public class TextEncryptor extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnBeginActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBeginActionPerformed
-        if (cmbMode.getSelectedIndex() == 0) {
+  if (cmbMode.getSelectedIndex() == 0) {
         } else {
             if (!txtInput.getText().isEmpty()) {
 
@@ -127,9 +132,9 @@ public class TextEncryptor extends javax.swing.JDialog {
         try {
             if (!txtInput.getText().isEmpty()) {
                 if (cmbMode.getSelectedIndex() == 0) {
-                    txtOutput.setText(Security.encrypt(Utils.ENCRYPT_KEY, txtInput.getText()));
+                    txtOutput.setText(Security.encrypt(Utils.envs.get("encKey"), txtInput.getText()));
                 } else {
-                    txtOutput.setText(Security.decrypt(Utils.ENCRYPT_KEY, txtInput.getText()));
+                    txtOutput.setText(Security.decrypt(Utils.envs.get("encKey"), txtInput.getText()));
                 }
             } else {
                 Utils.swingUI.showConfirmDialog("The input is empty.\nType something to begin.", "Input is empty", new Object[]{"Ok"});

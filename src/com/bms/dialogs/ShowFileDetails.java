@@ -3,6 +3,7 @@ package com.bms.dialogs;
 import com.bms.utility.Utils;
 import com.sdk.environment.OperatingSystem;
 import com.sdk.storage.files.TextFile;
+import java.awt.Color;
 import java.io.IOException;
 import java.util.Objects;
 import javax.swing.event.ListSelectionEvent;
@@ -26,9 +27,15 @@ public class ShowFileDetails extends javax.swing.JDialog {
         Utils.swingUI.setJDialogCenter(this);
         Utils.swingUI.setJDialogCloseESC(this);
         Utils.swingUI.makeJDialogMovable(this);
+        
+        panelTitle.setBackground(Color.decode(Utils.settings.getColorCode()));
+        btnCopy.setBackground(Color.decode(Utils.settings.getColorCode()));
+        tableInformation.setSelectionBackground(Color.decode(Utils.settings.getColorCode()));
+        
         Utils.swingUI.setTableNoneEditable(tableInformation);
         tableInformation.getColumnModel().getColumn(0).setMaxWidth(150);
         tableInformation.getColumnModel().getColumn(0).setPreferredWidth(120);
+        this.setTitle(textFile.getName());
 
         try {
 
@@ -61,7 +68,7 @@ public class ShowFileDetails extends javax.swing.JDialog {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel1 = new javax.swing.JPanel();
+        panelTitle = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         btnCopy = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -69,32 +76,33 @@ public class ShowFileDetails extends javax.swing.JDialog {
         btnClose = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("File information");
         setResizable(false);
 
-        jPanel1.setBackground(new java.awt.Color(51, 51, 255));
+        panelTitle.setBackground(new java.awt.Color(0, 0, 0));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 0, 20)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("File information");
 
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        javax.swing.GroupLayout panelTitleLayout = new javax.swing.GroupLayout(panelTitle);
+        panelTitle.setLayout(panelTitleLayout);
+        panelTitleLayout.setHorizontalGroup(
+            panelTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTitleLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+        panelTitleLayout.setVerticalGroup(
+            panelTitleLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(panelTitleLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        btnCopy.setBackground(new java.awt.Color(51, 51, 255));
+        btnCopy.setBackground(new java.awt.Color(0, 0, 0));
         btnCopy.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         btnCopy.setForeground(new java.awt.Color(255, 255, 255));
         btnCopy.setText("Copy");
@@ -122,7 +130,7 @@ public class ShowFileDetails extends javax.swing.JDialog {
                 return canEdit [columnIndex];
             }
         });
-        tableInformation.setSelectionBackground(new java.awt.Color(51, 51, 255));
+        tableInformation.setSelectionBackground(new java.awt.Color(0, 0, 0));
         jScrollPane1.setViewportView(tableInformation);
 
         btnClose.setText("Close");
@@ -137,7 +145,7 @@ public class ShowFileDetails extends javax.swing.JDialog {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(panelTitle, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -154,7 +162,7 @@ public class ShowFileDetails extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(panelTitle, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -243,8 +251,8 @@ public class ShowFileDetails extends javax.swing.JDialog {
     private javax.swing.JButton btnClose;
     private javax.swing.JButton btnCopy;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JPanel panelTitle;
     private javax.swing.JTable tableInformation;
     // End of variables declaration//GEN-END:variables
 }

@@ -2,6 +2,9 @@ package com.bms.dialogs;
 
 import com.bms.utility.Utils;
 import com.sdk.datatypes.Characters;
+import java.awt.Color;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ReplaceText extends javax.swing.JDialog {
 
@@ -16,6 +19,8 @@ public class ReplaceText extends javax.swing.JDialog {
         Utils.swingUI.setJDialogCenter(this);
         Utils.swingUI.setJDialogCloseESC(this);
         Utils.swingUI.makeJDialogMovable(this);
+        
+        btnReplace.setBackground(Color.decode(Utils.settings.getColorCode()));
     }
 
     @SuppressWarnings("unchecked")
@@ -28,10 +33,11 @@ public class ReplaceText extends javax.swing.JDialog {
         txtReplace = new javax.swing.JTextField();
         chkMatch = new javax.swing.JCheckBox();
         cmbType = new javax.swing.JComboBox<>();
-        btnFind = new javax.swing.JButton();
+        btnReplace = new javax.swing.JButton();
         btnClear = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Replace");
         setResizable(false);
 
         jLabel1.setText("Find");
@@ -43,11 +49,13 @@ public class ReplaceText extends javax.swing.JDialog {
 
         cmbType.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Default", "Uppercase", "Lowercase" }));
 
-        btnFind.setText("FInd");
-        btnFind.setFocusPainted(false);
-        btnFind.addActionListener(new java.awt.event.ActionListener() {
+        btnReplace.setBackground(new java.awt.Color(0, 0, 0));
+        btnReplace.setForeground(new java.awt.Color(254, 254, 254));
+        btnReplace.setText("Replace");
+        btnReplace.setFocusPainted(false);
+        btnReplace.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnFindActionPerformed(evt);
+                btnReplaceActionPerformed(evt);
             }
         });
 
@@ -84,7 +92,7 @@ public class ReplaceText extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnClear)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(btnFind)
+                .addComponent(btnReplace)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -104,7 +112,7 @@ public class ReplaceText extends javax.swing.JDialog {
                     .addComponent(cmbType, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(btnFind)
+                    .addComponent(btnReplace)
                     .addComponent(btnClear))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -117,36 +125,34 @@ public class ReplaceText extends javax.swing.JDialog {
         txtReplace.setText(Utils.strings.getEmptyString());
     }//GEN-LAST:event_btnClearActionPerformed
 
-    private void btnFindActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnFindActionPerformed
+    private void btnReplaceActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnReplaceActionPerformed
         if (!txtFind.getText().isEmpty() && !txtReplace.getText().isEmpty()) {
-            String text = null, find = txtFind.getText();
-            
-            switch(cmbType.getSelectedIndex()) {
+            String find = txtFind.getText();
+
+            switch (cmbType.getSelectedIndex()) {
                 case 1:
                     find = find.toUpperCase();
                     break;
-                    
+
                 case 2:
                     find = find.toLowerCase();
                     break;
             }
 
             if (chkMatch.isSelected()) {
-                String[] words = Utils.strings.split(this.text, "\\s+");
-                for (int i = 0; i < words.length; i++) {
-                    if (words[i].equals(find)) {
-                        words[i] = txtReplace.getText();
-                    }
-                }
+                Pattern p = Pattern.compile("\\b" + find + "\\b");
+                Matcher m = p.matcher(this.text);
 
-                text = Utils.strings.convertArrayToString(words, " ");
+                if (m.find()) {
+                    text = text.replace(find, txtReplace.getText());
+                }
             } else {
-                text = this.text.replace(find, txtReplace.getText());
+                text = text.replace(find, txtReplace.getText());
             }
 
             Utils.envs.put("replace", text);
         }
-    }//GEN-LAST:event_btnFindActionPerformed
+    }//GEN-LAST:event_btnReplaceActionPerformed
 
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -189,7 +195,7 @@ public class ReplaceText extends javax.swing.JDialog {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnClear;
-    private javax.swing.JButton btnFind;
+    private javax.swing.JButton btnReplace;
     private javax.swing.JCheckBox chkMatch;
     private javax.swing.JComboBox<String> cmbType;
     private javax.swing.JLabel jLabel1;

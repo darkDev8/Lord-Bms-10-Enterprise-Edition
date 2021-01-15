@@ -23,10 +23,8 @@ You can also run application from **out folder**.
 
 ## Note
 
-You need internet connection to run compiled application.<br/>
-
 ```
-The database is not available to modify
+You need internet connection to run compiled application.
 ```
 
 ## Screenshots
